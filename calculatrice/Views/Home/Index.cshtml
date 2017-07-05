@@ -1,0 +1,123 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+tr.border_bottom td {
+  border-bottom:1pt solid black;
+}
+    table {
+        border: 1px;
+         border-color: black;
+         border-style: double; 
+         line-height: 20px;
+         height:20px;
+    }
+
+</style>
+
+<form id="myForm">
+    <div align="center">
+        <table style="">
+            <tr class="border_bottom">
+                <td><H2>Calculator</H2></td>
+            </tr>
+            <tr>
+                <td>
+
+                    <input type="radio" class="radio" name="name" id="radioStandard" value="1" title="Standard" checked="checked" />Standard   
+            <input type="radio" class="radio" name="name" id="radioScientific" value="2" title="Scientific" />Scientific   
+            <input type="radio" class="radio" name="name" id="radioProgrammer" value="3" title="Programmer" />Programmer
+                
+            <br />
+                    <br />
+                    <input type="text" id="firstValue" />
+                    <select name="dropdown" id="MySelect" style="width: 80px">
+                    </select>
+                    <input type="text" id="secondValue" />
+                    = 
+            <span id="spanResult"></span>
+
+                </td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+
+    </div>
+</form>
+<script type="text/javascript">
+
+
+    $(function () {
+        //Fill the initial options for the operators in Standard mode
+        FillOperatorOptions(1);
+        $('input:radio').change(function () {
+            $('#firstValue').val("");
+            $('#secondValue').val("");
+            var selectedType = $('input[name=name]:checked', '#myForm').val();
+            FillOperatorOptions(selectedType);
+        });
+    });
+
+
+
+    function FillOperatorOptions(selectedType) {
+        $('#MySelect').empty();
+        $('#MySelect').append($('<option />').val("1").text("+"));
+        $('#MySelect').append($('<option />').val("2").text("-"));
+        $('#MySelect').append($('<option />').val("3").text("*"));
+        $('#MySelect').append($('<option />').val("4").text("/"));
+        switch (selectedType) {
+            case "2":
+                $('#MySelect').append($('<option />').val("5").text("x^y"));
+                $('#MySelect').append($('<option />').val("6").text("x root y"));
+                break;
+            case "3":
+                $('#MySelect').append($('<option />').val("7").text("x mod y"));
+                break;
+            default:
+
+        }
+    }
+
+    $('#MySelect').change(function () {
+        ComputeOperation();
+    });
+
+    $('#firstValue').blur(function () {
+        ComputeOperation();
+    });
+
+    $('#secondValue').blur(function () {
+        ComputeOperation();
+    });
+
+
+    function ComputeOperation() {
+        if ($('#firstValue').val() != "" && $('#secondValue').val() != "") {
+            var data = {
+                FirstValue: $('#firstValue').val(),
+                SecondtValue: $('#secondValue').val(),
+                OperatorType: $('#MySelect').val()
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "Home/PerformOperation",
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                success: function (data) {
+                    document.getElementById('spanResult').innerHTML = data;
+                },
+                error: function (data) {
+                    alert("error");
+                }
+            });
+        }
+    }
+
+
+</script>
+
